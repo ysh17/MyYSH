@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:Aop="http://www.springframework.org/schema/tx"
+       xmlns:tx="http://www.springframework.org/schema/tx" xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/context
+       http://www.springframework.org/schema/context/spring-context.xsd
+       http://www.springframework.org/schema/tx
+       http://www.springframework.org/schema/tx/spring-tx.xsd
+       http://www.springframework.org/schema/aop
+       http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+    <!--开启注解扫描 只扫描service包下的-->
+    <!--<context:component-scan base-package="com.itheima.service"/>-->
+
+    <!--开启组件扫描 排除controller注解不扫描
+    exclude-filter:排除
+    include-filter:包含-->
+    <context:component-scan base-package="com.itheima">
+        <context:exclude-filter type="annotation"  expression="org.springframework.stereotype.Controller"/>
+    </context:component-scan>
+
+
+    <!--配置事务管理器 本质就是aop  Aop就需要切面 目标对象中的切入点进行加强-->
+    <bean id="txManger" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+
+    <!--配置通知 这个通知的id就是txAdvice 管理了所有的方法 这些事务的管理者就是txManger-->
+    <tx:advice id="txAdvice" transaction-manager="txManger">
+        <Aop:attributes>
+            <!--
+            凡是以query，find开头的查询方法 设置只可以读取 不可以增删改
+            这样就会提升性能 spring底层就不需要去管脏读
+            -->
+            <tx:method name="query*" read-only="true"/>
+            <tx:method name="find*" read-only="true"/>
+            <Aop:method name="*"/>
+        </Aop:attributes>
+    </tx:advice>
+
+    <!--有了事务管理器 就需要切面 切面就是 通知（advice） + 切入点（Pointcut）-->
+    <!--配置切面-->
+    <aop:config>                                             <!--任意返回值类型 service里面的任意类任意方法任意参数-->
+        <aop:advisor advice-ref="txAdvice" pointcut="execution(* com.itheima.service..*.*(..))"/>
+    </aop:config>
+
+</beans>

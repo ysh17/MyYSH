@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd">
+
+    <!--
+    配置组件扫描 扫描web这个包中的所有类 如果有@Component，@Repository，@Service，@Controller
+    就会吧这些对象作为bean注册进spring容器中-->
+    <context:component-scan base-package="com.itheima.web"/>
+
+    <!--配置视图解析器
+    其实InternalResourceViewResolver的工作很简单: 在视图逻辑名前面加上prefix,后面加上suffix;-->
+    <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+        <property name="prefix" value="/pages/"/>
+        <property name="suffix" value=".jsp"/>
+    </bean>
+
+    <!--开启注解驱动-->
+    <mvc:annotation-driven/>
+
+    <!--处理静态资源 因为在前段控制器中使用了 <url-pattern>/</url-pattern>
+     拦截了所有的请求 而dispatcherServlet又不具备处理静态资源的能力
+     所以就需要继续用tomcat的原生Servlet出路静态资源-->
+    <mvc:default-servlet-handler/>
+
+</beans>

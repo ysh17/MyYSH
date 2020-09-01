@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+    <!--配置连接池-->
+    <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource">
+        <property name="driverClass" value="com.mysql.jdbc.Driver"/>
+        <property name="jdbcUrl" value="jdbc:mysql:///ssm"/>
+        <property name="user" value="root"/>
+        <property name="password" value="root"/>
+    </bean>
+
+    <!--配置SqlSessionFactory  只有有了这个bean可以得到dao层接口的代理对象 这个类是spring-Mybatis胶水包提供的-->
+    <bean class="org.mybatis.spring.SqlSessionFactoryBean">
+        <!--必须注入dataSource 数据库-->
+        <property name="dataSource" ref="dataSource"/>
+
+        <!--把domain包里的类全部注册别名：类名即别名，别名不区分大小写-->
+        <property name="typeAliasesPackage" value="com.itheima.domain"/>
+    </bean>
+
+
+    <!--配置扫描映射器  扫描指定的包 自动扫描将Mapper接口生成的代理对象注入spring容器中-->
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <!--注入指定的包-->
+        <!--basePackage 属性是让你为映射器接口文件设置 需要扫描的 基本的包路径-->
+        <property name="basePackage" value="com.itheima.dao"/>
+    </bean>
+
+
+</beans>
